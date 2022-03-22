@@ -354,4 +354,21 @@ typedef enum
   GSK_GL_UNIFORM_TYPE_VEC4,
 } GskGLUniformType;
 
+/**
+ * GskConvexity:
+ * @GSK_CONVEXITY_UNKNOWN: It is not known if the path is convex
+ * @GSK_CONVEXITY_CONVEX: The path is convex
+ * @GSK_CONVEXITY_CONCAVE: The path is not convex
+ *
+ * Information about the convexity of a path, which can be
+ * obtained with [method@Gsk.Path.get_convexity] or
+ * [method@Gsk.Path.compute_convexity].
+ */
+typedef enum
+{
+  GSK_CONVEXITY_UNKNOWN,
+  GSK_CONVEXITY_CONVEX,
+  GSK_CONVEXITY_CONCAVE,
+} GskConvexity;
+
 #endif /* __GSK_TYPES_H__ */

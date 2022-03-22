@@ -122,6 +122,9 @@ void                    gsk_contour_default_offset              (const GskContou
                                                                  GskLineJoin             line_join,
                                                                  float                   miter_limit);
 
+GskConvexity            gsk_contour_get_convexity               (const GskContour       *contour);
+GskConvexity            gsk_contour_compute_convexity           (const GskContour       *contour);
+
 G_END_DECLS
 
 #endif /* __GSK_CONTOUR_PRIVATE_H__ */
