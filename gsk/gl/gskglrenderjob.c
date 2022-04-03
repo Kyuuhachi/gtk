@@ -2860,8 +2860,16 @@ gsk_gl_render_job_visit_cross_fade_node (GskGLRenderJob      *job,
   gsk_gl_render_job_end_draw (job);
 }
 
+/* Figure out whether we need an offscreen to handle
+ * opacity correctly for this node. We don't if there
+ * is only one drawing node inside (could be child
+ * node, or grandchild, or...).
+ *
+ * For containers with multiple children, we can avoid
+ * the offscreen if the children are known not to overlap.
+ */
 static gboolean
-is_non_branching (const GskRenderNode *node)
+opacity_needs_offscreen (const GskRenderNode *node)
 {
   switch ((int)gsk_render_node_get_node_type (node))
     {
@@ -2877,38 +2885,46 @@ is_non_branching (const GskRenderNode *node)
     case GSK_OUTSET_SHADOW_NODE:
     case GSK_TEXT_NODE:
     case GSK_CAIRO_NODE:
-      return TRUE;
+      return FALSE;
 
     case GSK_TRANSFORM_NODE:
-      return is_non_branching (gsk_transform_node_get_child (node));
+      return opacity_needs_offscreen (gsk_transform_node_get_child (node));
 
     case GSK_OPACITY_NODE:
-      return is_non_branching (gsk_opacity_node_get_child (node));
+      return opacity_needs_offscreen (gsk_opacity_node_get_child (node));
 
     case GSK_COLOR_MATRIX_NODE:
-      return is_non_branching (gsk_color_matrix_node_get_child (node));
+      return opacity_needs_offscreen (gsk_color_matrix_node_get_child (node));
 
     case GSK_CLIP_NODE:
-      return is_non_branching (gsk_clip_node_get_child (node));
+      return opacity_needs_offscreen (gsk_clip_node_get_child (node));
 
     case GSK_ROUNDED_CLIP_NODE:
-      return is_non_branching (gsk_rounded_clip_node_get_child (node));
+      return opacity_needs_offscreen (gsk_rounded_clip_node_get_child (node));
 
     case GSK_SHADOW_NODE:
-      return is_non_branching (gsk_shadow_node_get_child (node));
+      return opacity_needs_offscreen (gsk_shadow_node_get_child (node));
 
     case GSK_BLUR_NODE:
-      return is_non_branching (gsk_shadow_node_get_child (node));
+      return opacity_needs_offscreen (gsk_shadow_node_get_child (node));
 
     case GSK_DEBUG_NODE:
-      return is_non_branching (gsk_debug_node_get_child (node));
+      return opacity_needs_offscreen (gsk_debug_node_get_child (node));
 
     case GSK_CONTAINER_NODE:
-      return gsk_container_node_get_n_children (node) == 1 &&
-             is_non_branching (gsk_container_node_get_child (node, 0));
+      if (!gsk_container_node_is_disjoint (node))
+        return TRUE;
+
+      for (int i = 0; i < gsk_container_node_get_n_children (node); i++)
+        {
+          if (opacity_needs_offscreen (gsk_container_node_get_child (node, i)))
+            return TRUE;
+        }
+
+      return FALSE;
 
     default:
-      return FALSE;
+      return TRUE;
     }
 }
 
@@ -2924,11 +2940,7 @@ gsk_gl_render_job_visit_opacity_node (GskGLRenderJob      *job,
     {
       float prev_alpha = gsk_gl_render_job_set_alpha (job, new_alpha);
 
-      /* Handle a few easy cases without offscreen. We bail out
-       * as soon as we see nodes with multiple children - in theory,
-       * we would only need offscreens for overlapping children.
-       */
-      if (is_non_branching (child))
+      if (!opacity_needs_offscreen (child))
         {
           gsk_gl_render_job_visit_node (job, child);
           gsk_gl_render_job_set_alpha (job, prev_alpha);
