@@ -49,18 +49,8 @@ main()
   float gsdist = glyphy_sdf (p, gi.nominal_size GLYPHY_DEMO_EXTRA_ARGS);
   float sdist = gsdist / m * u_contrast;
 
-  if (!u_debug) {
-    sdist -= u_boldness * 10.;
-    if (u_outline)
-      sdist = abs (sdist) - u_outline_thickness * .5;
-    if (sdist > 1.)
-      discard;
-    float alpha = antialias (-sdist);
-    if (u_gamma_adjust != 1.)
-      alpha = pow (alpha, 1./u_gamma_adjust);
-
-    gskSetOutputColor(final_color * alpha);
-  } else {
+#if 0
+  if (u_debug) {
     vec4 color = vec4 (0,0,0,0);
 
     // Color the inside of the glyph a light red
@@ -83,5 +73,19 @@ main()
     color += vec4 (0,0,1,.1) * float(arc_list.num_endpoints) * 32./255.;
 
     gskSetOutputColor(color);
+  }
+  else
+#endif
+  {
+    sdist -= u_boldness * 10.;
+    if (u_outline)
+      sdist = abs (sdist) - u_outline_thickness * .5;
+    if (sdist > 1.)
+      discard;
+    float alpha = antialias (-sdist);
+    if (u_gamma_adjust != 1.)
+      alpha = pow (alpha, 1./u_gamma_adjust);
+
+    gskSetOutputColor(final_color * alpha);
   }
 }
