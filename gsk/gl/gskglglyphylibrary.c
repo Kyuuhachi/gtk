@@ -184,11 +184,15 @@ gsk_gl_glyphy_library_finalize (GObject *object)
   G_OBJECT_CLASS (gsk_gl_glyphy_library_parent_class)->finalize (object);
 }
 
+GQuark quark_glyphy_font_key;
+
 static void
 gsk_gl_glyphy_library_class_init (GskGLGlyphyLibraryClass *klass)
 {
   GObjectClass *object_class = G_OBJECT_CLASS (klass);
   GskGLTextureLibraryClass *library_class = GSK_GL_TEXTURE_LIBRARY_CLASS (klass);
+
+  quark_glyphy_font_key = g_quark_from_static_string ("glyphy-font-key");
 
   object_class->finalize = gsk_gl_glyphy_library_finalize;
 

@@ -32,19 +32,21 @@ G_BEGIN_DECLS
 
 typedef guint FontKey;
 
+extern GQuark quark_glyphy_font_key;
+
 static inline FontKey
 gsk_gl_glyphy_library_get_font_key (PangoFont *font)
 {
   FontKey key;
 
-  key = (FontKey) GPOINTER_TO_UINT (g_object_get_data ((GObject *)font, "glyphy-font-key"));
+  key = (FontKey) GPOINTER_TO_UINT (g_object_get_qdata ((GObject *)font, quark_glyphy_font_key));
   if (key == 0)
     {
       PangoFontDescription *desc = pango_font_describe (font);
       pango_font_description_set_size (desc, 10 * PANGO_SCALE);
       key = (FontKey) pango_font_description_hash (desc);
       pango_font_description_free (desc);
-      g_object_set_data ((GObject *)font, "glyphy-font-key", GUINT_TO_POINTER (key));
+      g_object_set_qdata ((GObject *)font, quark_glyphy_font_key, GUINT_TO_POINTER (key));
     }
 
   return key;

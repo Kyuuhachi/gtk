@@ -3076,7 +3076,7 @@ typedef struct
   float g16lo;
 } EncodedGlyph;
 
-static unsigned int
+static inline unsigned int
 glyph_encode (guint atlas_x ,  /* 7 bits */
               guint atlas_y,   /* 7 bits */
               guint corner_x,  /* 1 bit */
@@ -3099,7 +3099,7 @@ glyph_encode (guint atlas_x ,  /* 7 bits */
   return (x << 16) | y;
 }
 
-static void
+static inline void
 encoded_glyph_init (EncodedGlyph           *eg,
                     float                   x,
                     float                   y,
