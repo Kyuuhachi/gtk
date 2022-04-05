@@ -505,7 +505,7 @@ add_place (GtkPlacesSidebar            *sidebar,
                       "start-icon", start_icon,
                       "end-icon", end_icon,
                       "label", name,
-                      "tooltip", tooltip,
+                      "tooltip", uri != NULL && strncmp(uri, "file://", 7) == 0 ? uri + 7 : uri,
                       "ejectable", show_eject_button,
                       "order-index", index,
                       "section-type", section_type,
@@ -1096,7 +1096,7 @@ update_places (GtkPlacesSidebar *sidebar)
   start_icon = g_themed_icon_new_with_default_fallbacks (ICON_NAME_HOME);
   add_place (sidebar, PLACES_BUILT_IN,
              SECTION_COMPUTER,
-             _("Home"), start_icon, NULL, home_uri,
+             "~", start_icon, NULL, home_uri,
              NULL, NULL, NULL, NULL, 0,
              _("Open your personal folder"));
   g_object_unref (start_icon);
@@ -1365,17 +1365,13 @@ update_places (GtkPlacesSidebar *sidebar)
   g_list_free (volumes);
 
   /* file system root */
-  if (!sidebar->show_other_locations)
-    {
-      mount_uri = "file:///"; /* No need to strdup */
-      start_icon = g_themed_icon_new_with_default_fallbacks (ICON_NAME_FILESYSTEM);
-      add_place (sidebar, PLACES_BUILT_IN,
-                 SECTION_MOUNTS,
-                 sidebar->hostname, start_icon, NULL, mount_uri,
-                 NULL, NULL, NULL, NULL, 0,
-                 _("Open the contents of the file system"));
-      g_object_unref (start_icon);
-    }
+  start_icon = g_themed_icon_new_with_default_fallbacks (ICON_NAME_FILESYSTEM);
+  add_place (sidebar, PLACES_BUILT_IN,
+             SECTION_COMPUTER,
+             "/", start_icon, NULL, "file:///",
+             NULL, NULL, NULL, NULL, 0,
+             _("Open the contents of the file system"));
+  g_object_unref (start_icon);
 
   /* add mounts that has no volume (/etc/mtab mounts, ftp, sftp,...) */
   mounts = g_volume_monitor_get_mounts (sidebar->volume_monitor);
@@ -5433,6 +5429,7 @@ void
 gtk_places_sidebar_set_local_only (GtkPlacesSidebar *sidebar,
                                    gboolean          local_only)
 {
+  return; // 98 XXX bad
   g_return_if_fail (GTK_IS_PLACES_SIDEBAR (sidebar));
 
   local_only = !!local_only;
