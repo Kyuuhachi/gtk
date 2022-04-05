@@ -192,7 +192,6 @@ server_list_load (GtkPlacesView *view)
   datadir = g_build_filename (g_get_user_config_dir (), "gtk-3.0", NULL);
   filename = g_build_filename (datadir, "servers", NULL);
 
-  g_mkdir_with_parents (datadir, 0700);
   g_bookmark_file_load_from_file (bookmarks, filename, &error);
 
   if (error)
