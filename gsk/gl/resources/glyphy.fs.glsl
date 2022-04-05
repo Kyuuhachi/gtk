@@ -47,6 +47,7 @@ main()
   float m = length (vec2 (length (dpdx), length (dpdy))) * SQRT2_2;
 
   float gsdist = glyphy_sdf (p, gi.nominal_size GLYPHY_DEMO_EXTRA_ARGS);
+  gsdist -= u_boldness;
   float sdist = gsdist / m * u_contrast;
 
 #if 0
@@ -70,14 +71,13 @@ main()
 
     glyphy_arc_list_t arc_list = glyphy_arc_list (p, gi.nominal_size GLYPHY_DEMO_EXTRA_ARGS);
     // Color the number of endpoints per cell blue
-    color += vec4 (0,0,1,.1) * float(arc_list.num_endpoints) * 32./255.;
+    color += vec4 (0,0,1,.4) * float(arc_list.num_endpoints) * 32./255.;
 
     gskSetOutputColor(color);
   }
   else
 #endif
   {
-    sdist -= u_boldness * 10.;
     if (u_outline)
       sdist = abs (sdist) - u_outline_thickness * .5;
     if (sdist > 1.)
