@@ -361,6 +361,15 @@ gtk_settings_init (GtkSettings *settings)
       g_free (path);
     }
 
+  path = g_getenv("KODOKU_HOME");
+  if(path != NULL)
+    {
+      path = g_build_filename (path, "gtk", ".config", "gtk-3.0", "settings.ini", NULL);
+      if (g_file_test (path, G_FILE_TEST_EXISTS))
+        gtk_settings_load_from_key_file (settings, path, GTK_SETTINGS_SOURCE_DEFAULT);
+      g_free (path);
+    }
+
   path = g_build_filename (g_get_user_config_dir (), "gtk-3.0", "settings.ini", NULL);
   if (g_file_test (path, G_FILE_TEST_EXISTS))
     gtk_settings_load_from_key_file (settings, path, GTK_SETTINGS_SOURCE_DEFAULT);
