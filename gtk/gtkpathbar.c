@@ -1849,7 +1849,8 @@ _gtk_path_bar_set_file_system (GtkPathBar    *path_bar,
 
   path_bar->priv->file_system = g_object_ref (file_system);
 
-  home = g_get_home_dir ();
+  home = g_getenv ("USER_HOME");
+  if (!home) home = g_get_home_dir ();
   if (home != NULL)
     {
       const gchar *desktop;

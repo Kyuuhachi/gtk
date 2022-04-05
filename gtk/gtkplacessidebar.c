@@ -601,7 +601,8 @@ path_is_home_dir (const gchar *path)
   const gchar *home_path;
   gboolean res;
 
-  home_path = g_get_home_dir ();
+  home_path = g_getenv ("USER_HOME");
+  if (!home_path) home_path = g_get_home_dir ();
   if (!home_path)
     return FALSE;
 
@@ -621,7 +622,8 @@ open_home (GtkPlacesSidebar *sidebar)
   const gchar *home_path;
   GFile       *home_dir;
 
-  home_path = g_get_home_dir ();
+  home_path = g_getenv ("USER_HOME");
+  if (!home_path) home_path = g_get_home_dir ();
   if (!home_path)
     return;
 
@@ -694,7 +696,8 @@ get_home_directory_uri (void)
 {
   const gchar *home;
 
-  home = g_get_home_dir ();
+  home = g_getenv ("USER_HOME");
+  if (!home) home = g_get_home_dir ();
   if (!home)
     return NULL;
 

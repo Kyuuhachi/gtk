@@ -1801,7 +1801,8 @@ model_add_special (GtkFileChooserButton *button)
   store = GTK_LIST_STORE (button->priv->model);
   pos = model_get_type_position (button, ROW_TYPE_SPECIAL);
 
-  homedir = g_get_home_dir ();
+  homedir = g_getenv ("USER_HOME");
+  if (!homedir) homedir = g_get_home_dir ();
 
   if (homedir)
     {
@@ -1841,7 +1842,7 @@ model_add_special (GtkFileChooserButton *button)
   /* "To disable a directory, point it to the homedir."
    * See http://freedesktop.org/wiki/Software/xdg-user-dirs
    */
-  if (g_strcmp0 (desktopdir, g_get_home_dir ()) != 0)
+  if (g_strcmp0 (desktopdir, homedir) != 0)
     {
       GtkTreePath *tree_path;
       GCancellable *cancellable;

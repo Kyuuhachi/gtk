@@ -3001,7 +3001,8 @@ set_extra_widget (GtkFileChooserWidget *impl,
 static void
 switch_to_home_dir (GtkFileChooserWidget *impl)
 {
-  const gchar *home = g_get_home_dir ();
+  const gchar *home = g_getenv ("USER_HOME");
+  if (!home) home = g_get_home_dir ();
   GFile *home_file;
 
   if (home == NULL)
@@ -4097,7 +4098,9 @@ add_cwd_to_sidebar_if_needed (GtkFileChooserWidget *impl)
   if (shortcut_exists (impl, cwd_file))
     goto out;
 
-  home_file = g_file_new_for_path (g_get_home_dir ());
+  const gchar *home = g_getenv ("USER_HOME");
+  if (!home) home = g_get_home_dir ();
+  home_file = g_file_new_for_path (home);
 
   /* We only add an item for $CWD if it is different from $HOME.  This way,
    * applications which get launched from a shell in a terminal (by someone who
@@ -5282,7 +5285,9 @@ file_system_model_set (GtkFileSystemModel *model,
         GFile *dir_location;
         gchar *location;
 
-        home_location = g_file_new_for_path (g_get_home_dir ());
+        const gchar *home = g_getenv ("USER_HOME");
+        if (!home) home = g_get_home_dir ();
+        home_location = g_file_new_for_path (home);
         if (file)
           dir_location = g_file_get_parent (file);
         else
@@ -8246,13 +8251,15 @@ home_folder_handler (GtkFileChooserWidget *impl)
 static void
 desktop_folder_handler (GtkFileChooserWidget *impl)
 {
-  const char *name;
+  const char *name, *home;
 
   /* "To disable a directory, point it to the homedir."
    * See http://freedesktop.org/wiki/Software/xdg-user-dirs
    */
   name = g_get_user_special_dir (G_USER_DIRECTORY_DESKTOP);
-  if (!g_strcmp0 (name, g_get_home_dir ()))
+  home = g_getenv ("USER_HOME");
+  if (!home) home = g_get_home_dir ();
+  if (!g_strcmp0 (name, home))
     return;
 
   gtk_file_chooser_set_current_folder (GTK_FILE_CHOOSER (impl), name);
